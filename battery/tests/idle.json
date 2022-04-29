@@ -1,5 +1,8 @@
-{"name":"idle",
-    "backlight":0.5,
-    "profile":"balanced",
-    "apps":[],
+{
+"name": "idle", 
+"backlight": 0.5,
+"profile": "balanced",
+"duration": 4,
+"apps": []
 }
+

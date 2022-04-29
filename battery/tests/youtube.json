@@ -1,0 +1,8 @@
+{
+"name": "idle", 
+"backlight": 0.5,
+"profile": "balanced",
+"duration": 10,
+"apps": [["firefox","https://www.youtube.com/watch?v=tdlq_dDtSqw"]]
+}
+

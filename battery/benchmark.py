@@ -70,6 +70,15 @@ def gather_info(infoType):
                 print("  ",key,":",pp[key])
     print("\n")    
 
+
+def run_app(app):
+   
+    output = subprocess.Popen(
+                app
+                )
+    return output
+
+
 if args.quick:
     print("Running quick battery tests")
     
@@ -83,5 +92,45 @@ if args.monitor:
         os.system('clear')
         
 if args.test:
+    name = "unknown"
+    duration = 10
+    apps = []
+    backlight = 0.5
+    begin = {}
+    end = {}
+    
+    
     if os.path.exists(args.test):
-        print(args.test)
+        test = open(args.test,"r")
+        test_settings = json.loads(test.read())
+        test.close()
+        if "duration" in test_settings.keys():
+            duration = test_settings["duration"]
+        if "apps" in test_settings.keys():
+            apps = test_settings["apps"]
+        if "backlight" in test_settings.keys():
+            backlight = test_settings["backlight"]
+        if "name" in test_settings.keys():
+            name = test_settings["name"]
+        if "apps" in test_settings.keys():
+            apps = test_settings["apps"]
+            
+    os.system("clear")    
+    print("Running test",name)
+    print("  Backlight =", backlight)
+    print("  Durtation =", duration,"minutes")
+    for a in apps:
+        print("  Launching",a)
+        run_app(a)
+    
+    gather_info("all")
+    begin = battery()
+    time.sleep(duration*60)
+    end = battery()
+    gather_info("all")
+    battery_loss = float(begin["charge_now"]) - float(end["charge_now"])
+    battery_life = float(duration) * (float(begin["charge_full"]) / battery_loss) 
+    print("\nTest complete")
+    print("Percent battery loss in",duration,"minutes is:",float(begin["percent"]) - float(end["percent"]),"%")
+    print("estimated battery life:",battery_life,"minutes -or-",battery_life/60)
+    
