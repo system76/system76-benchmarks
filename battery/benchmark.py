@@ -3,7 +3,6 @@
 import json
 import time
 import argparse
-import mysql.connector
 import subprocess
 import signal
 import sys
@@ -44,9 +43,15 @@ def power_profile():
     if os.path.exists("/usr/bin/system76-power"):
         #print("found system76-power")
         info["graphics"] = subprocess.run(["system76-power","graphics"],capture_output=True,text=True).stdout.split("\n")[0]
-        
-    bmax = sys_file("/sys/class/backlight/acpi_video0/","max_brightness")
-    bcurrent = sys_file("/sys/class/backlight/acpi_video0/","brightness")
+    if os.path.exists("/sys/class/backlight/acpi_video0/"):
+        bmax = sys_file("/sys/class/backlight/acpi_video0/","max_brightness")
+        bcurrent = sys_file("/sys/class/backlight/acpi_video0/","brightness")
+    elif os.path.exists("/sys/class/backlight/intel_backlight/"):
+        bmax = sys_file("/sys/class/backlight/intel_backlight/","max_brightness")
+        bcurrent = sys_file("/sys/class/backlight/intel_backlight/","brightness")
+    elif os.path.exists("/sys/class/backlight/amdgpu_bl0/"):
+        bmax = sys_file("/sys/class/backlight/amdgpu_bl0/","max_brightness")
+        bcurrent = sys_file("/sys/class/backlight/amdgpu_bl0/","brightness")
     info["backlight"] = {
                          "max":float(bmax),
                          "current":float(bcurrent),
