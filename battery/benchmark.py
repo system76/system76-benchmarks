@@ -3,7 +3,6 @@
 import json
 import time
 import argparse
-import mysql.connector
 import subprocess
 import signal
 import sys
