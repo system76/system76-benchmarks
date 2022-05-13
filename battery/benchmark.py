@@ -9,8 +9,9 @@ import sys
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--info",action="count",help="gather and display battery info")
-parser.add_argument("--quick", action="count",help="Run a quick battery tests")
+parser.add_argument("--info",action="count",help="Gather and display battery info")
+parser.add_argument("--quick", action="count",help="Run a quick battery test")
+parser.add_argument("--full", action = "count",help="Run comprehensive battery test")
 parser.add_argument("--monitor",action="count",help="Monitor battery in 5 second intervals")
 parser.add_argument("--test",help="Run selected test")
 
@@ -120,27 +121,27 @@ def run_test(name,duration,apps,backlight):
     begin = battery()
     time.sleep(duration*60)
     end = battery()
-    gather_info("all")
+    #gather_info("all")
     battery_loss = float(begin["charge_now"]) - float(end["charge_now"])
     battery_life = float(duration) * (float(begin["charge_full"]) / battery_loss) 
     print("\nTest complete")
     print("Percent battery loss in",duration,"minutes is:",float(begin["percent"]) - float(end["percent"]),"%")
-    print("estimated battery life:",battery_life,"minutes -or-",battery_life/60)
+    print("estimated battery life:","{:.2f}".format(battery_life),"minutes -or-","{:.2f}".format(battery_life/60))
 
 if args.quick:
     print("Running quick battery tests")
-    gather_info("all")
+   # gather_info("all")
     print("\n")
     switch_power_profile("battery")
-    run_test("battery profile",5,[],0.1)
+    run_test("battery profile",2,[],0.5)
     time.sleep(10)
     print("\n")
     switch_power_profile("balanced")
-    run_test("balanced profile",5,[],0.1)
+    run_test("balanced profile",2,[],0.5)
     time.sleep(10)
     print("\n")
     switch_power_profile("performance")
-    run_test("performance profile",5,[],0.1)
+    run_test("performance profile",2,[],0.5)
     
     
 if args.info:
