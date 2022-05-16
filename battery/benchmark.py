@@ -13,7 +13,7 @@ parser.add_argument("--info",action="count",help="Gather and display battery inf
 parser.add_argument("--quick", action="count",help="Run a quick battery test")
 parser.add_argument("--full", action = "count",help="Run comprehensive battery test")
 parser.add_argument("--monitor",action="count",help="Monitor battery in 5 second intervals")
-parser.add_argument("--test",help="Run selected test")
+parser.add_argument("--test",help="Run selected test (examples found in ./tests)")
 
 
 args = parser.parse_args()
@@ -42,16 +42,9 @@ def power_profile():
     info = {}
     
     if os.path.exists("/usr/bin/system76-power"):
-        #print("found system76-power")
+        info["profile"] = subprocess.run(["system76-power","profile"],capture_output=True,text=True).stdout.split("\n")[0].split(":")[1]
         info["graphics"] = subprocess.run(["system76-power","graphics"],capture_output=True,text=True).stdout.split("\n")[0]
-    
-   # bmax = sys_file("/sys/class/backlight/acpi_video0/","max_brightness")
-  #  bcurrent = sys_file("/sys/class/backlight/acpi_video0/","brightness")
-   # info["backlight"] = {
-   #                      "max":float(bmax),
-    #                     "current":float(bcurrent),
-    #                     "precent":float(bcurrent)/float(bmax)
-     #                   }
+        
         
     return info
 
@@ -108,7 +101,6 @@ def run_test(name,duration,apps,backlight):
 
     begin = {}
     end = {}
-    #os.system("clear") 
     print("Running test",name)
     print("  Backlight =", backlight)
     print("  Durtation =", duration,"minutes")
@@ -121,16 +113,15 @@ def run_test(name,duration,apps,backlight):
     begin = battery()
     time.sleep(duration*60)
     end = battery()
-    #gather_info("all")
     battery_loss = float(begin["charge_now"]) - float(end["charge_now"])
     battery_life = float(duration) * (float(begin["charge_full"]) / battery_loss) 
     print("\nTest complete")
     print("Percent battery loss in",duration,"minutes is:",float(begin["percent"]) - float(end["percent"]),"%")
-    print("estimated battery life:","{:.2f}".format(battery_life),"minutes -or-","{:.2f}".format(battery_life/60))
+    print("Estimated battery life:","{:.2f}".format(battery_life),"minutes -or-","{:.2f}".format(battery_life/60),"hours")
 
 if args.quick:
+    os.system("clear")
     print("Running quick battery tests")
-   # gather_info("all")
     print("\n")
     switch_power_profile("battery")
     run_test("battery profile",2,[],0.5)
@@ -142,6 +133,63 @@ if args.quick:
     print("\n")
     switch_power_profile("performance")
     run_test("performance profile",2,[],0.5)
+    
+if args.full:
+    os.system("clear")
+    print("Running full battery test suite")
+    print("\n")
+    
+    print("Battery Power profile tests\n")
+    
+    print("\n10% brightness\n")
+    switch_power_profile("battery")
+    run_test("battery profile",5,[],0.1)
+    time.sleep(10)
+   
+    print("\n50% brightness\n")
+    switch_power_profile("battery")
+    run_test("battery profile",5,[],0.5)
+    time.sleep(10)
+    
+    print("\n100% brightness\n")
+    switch_power_profile("battery")
+    run_test("battery profile",5,[],1)
+    time.sleep(10)
+    print("\n")
+    
+    print("Ballanced Power profile tests\n")
+    print("\n10% brightness\n")
+    switch_power_profile("balanced")
+    run_test("balanced profile",5,[],0.1)
+    time.sleep(10)
+    
+    print("\n50% brightness\n")
+    switch_power_profile("balanced")
+    run_test("balanced profile",5,[],0.5)
+    time.sleep(10)
+    
+    print("\n100% brightness\n")
+    switch_power_profile("balanced")
+    run_test("balanced profile",5,[],1)
+    time.sleep(10)
+    
+    print("\n")
+    
+    print("Performance Power profile tests\n")
+    print("\n10% brightness\n")
+    switch_power_profile("performance")
+    run_test("performance profile",5,[],0.1)
+    time.sleep(10)
+    
+    print("\n50% brightness\n")
+    switch_power_profile("performance")
+    run_test("performance profile",5,[],0.5)
+    time.sleep(10)
+    
+    print("\n100% brightness\n")
+    switch_power_profile("performance")
+    run_test("performance profile",5,[],1)
+    time.sleep(10)
     
     
 if args.info:
