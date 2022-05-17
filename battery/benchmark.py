@@ -28,7 +28,11 @@ def sys_file(root, file):
     return output
 
 def battery():
-    rootdir = "/sys/class/power_supply/BAT0/"
+    
+    if not os.path.exists("/sys/class/power_supply/BAT0/"):
+    	rootdir = "/sys/class/power_supply/BATT/"
+    else:
+        rootdir = "/sys/class/power_supply/BAT0/"
     info = {}
     info["status"] = sys_file(rootdir,"status")
     info["percent"] = sys_file(rootdir,"capacity")
