@@ -103,7 +103,7 @@ def run_test(name,duration,apps,backlight):
     end = {}
     print("Running test",name)
     print("  Backlight =", backlight)
-    print("  Durtation =", duration,"minutes")
+    print("  Duration =", duration,"minutes")
     set_backlight(backlight)
     for a in apps:
         print("  Launching",a)
