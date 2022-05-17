@@ -28,10 +28,9 @@ def sys_file(root, file):
     return output
 
 def battery():
-    try:
-        os.path.exists("/sys/class/power_supply/BAT0/")
-    except:
-         rootdir = "/sys/class/power_supply/BATT/"
+    
+    if not os.path.exists("/sys/class/power_supply/BAT0/"):
+    	rootdir = "/sys/class/power_supply/BATT/"
     else:
         rootdir = "/sys/class/power_supply/BAT0/"
     info = {}
