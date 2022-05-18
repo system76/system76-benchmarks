@@ -19,9 +19,16 @@ parser.add_argument("--test",help="Run selected test (examples found in ./tests)
 args = parser.parse_args()
 
 def gsettings():
+    for opt in [
+    ["org.gnome.settings-daemon.plugins.power", "ambient-enabled", "false"],
+    ["org.gnome.desktop.screensaver", "lock-enabled", "false"],
+    ["org.gnome.desktop.session","idle-delay","0"],
+    ["org.gnome.desktop.screensaver", "idle-delay","0"]
+    ]:
+        subprocess.run(["gsettings","set",opt[0],opt[1],opt[2]])
     
-    subprocess.run(["gsettings","set","org.gnome.settings-daemon.plugins.power", "ambient-enabled", "false"])
-    subprocess.run(["gsettings","set","org.gnome.desktop.screensaver", "lock-enabled", "false"])
+    #subprocess.run(["xset","s","off"])
+    #subprocess.run(["xset","s","noblank"])
 
     
 
@@ -134,6 +141,9 @@ def run_test(name,duration,apps,backlight):
     print("Percent battery loss in",duration,"minutes is:",float(begin["percent"]) - float(end["percent"]),"%")
     hours = "{:.0f}".format(battery_life/60)
     minutes = "{:.0f}".format((battery_life%60) * 0.6)
+    if int(minutes) < 10:
+        minutes = "0{:.0f}".format((battery_life%60) * 0.6)
+        
     print("Estimated battery life:","{:.2f}".format(battery_life),"minutes -or-",hours+":"+minutes,"hours")
 
 if args.quick:
