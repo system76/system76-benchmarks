@@ -18,6 +18,13 @@ parser.add_argument("--test",help="Run selected test (examples found in ./tests)
 
 args = parser.parse_args()
 
+def gsettings():
+    
+    subprocess.run(["gsettings","set","org.gnome.settings-daemon.plugins.power", "ambient-enabled", "false"])
+    subprocess.run(["gsettings","set","org.gnome.desktop.screensaver", "lock-enabled", "false"])
+
+    
+
 def sys_file(root, file):
    
     output = subprocess.run(
@@ -60,6 +67,8 @@ def switch_power_profile(mode):
         return output
 
 def gather_info(infoType):
+    gsettings()
+    #subprocess.run(["sudo"
     print("\n")
     match infoType:
        case "all":
@@ -77,7 +86,9 @@ def gather_info(infoType):
 def run_app(app):
    
     output = subprocess.Popen(
-                app
+                app,
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE
                 )
     return output
     
@@ -121,7 +132,9 @@ def run_test(name,duration,apps,backlight):
     battery_life = float(duration) * (float(begin["charge_full"]) / battery_loss) 
     print("\nTest complete")
     print("Percent battery loss in",duration,"minutes is:",float(begin["percent"]) - float(end["percent"]),"%")
-    print("Estimated battery life:","{:.2f}".format(battery_life),"minutes -or-","{:.2f}".format(battery_life/60),"hours")
+    hours = "{:.0f}".format(battery_life/60)
+    minutes = "{:.0f}".format((battery_life%60) * 0.6)
+    print("Estimated battery life:","{:.2f}".format(battery_life),"minutes -or-",hours+":"+minutes,"hours")
 
 if args.quick:
     os.system("clear")
